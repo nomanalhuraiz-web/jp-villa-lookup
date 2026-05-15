@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jumeirah Park · Villa Lookup</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b1622;--surface:#111e2e;--surface2:#162030;
+  --border:#1e3552;--border2:#243f63;
+  --text:#d8e4f0;--muted:#4a7090;--hint:#2a4560;
+  --blue:#4a90c4;--blue-bg:#0d2440;--blue-bd:#1a3a60;
+  --green:#3cb870;--green-bg:#0a1f14;--green-bd:#1a3c28;
+  --orange:#d47830;--orange-bg:#1c1008;--orange-bd:#3c2010;
+  --purple:#a060e0;--purple-bg:#160a24;--purple-bd:#2e1a4a;
+  --pink:#d04880;--pink-bg:#1c0814;--pink-bd:#3c1028;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:linear-gradient(135deg,#080f1a,#0c1c30);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;gap:20px;position:sticky;top:0;z-index:50;}
+.logo-mark{width:34px;height:34px;border-radius:8px;background:var(--blue-bg);border:1px solid var(--blue-bd);display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text .t1{font-size:14px;font-weight:700;color:#fff}
+.logo-text .t2{font-size:10px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+.hdr-right{margin-left:auto}
+.stat-n{font-size:18px;font-weight:700;color:var(--blue)}
+.stat-l{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.search-panel{padding:32px 32px 0;max-width:900px;margin:0 auto}
+.search-wrap{position:relative}
+#inp{width:100%;height:48px;padding:0 48px 0 18px;background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;outline:none;transition:border .15s}
+#inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,144,196,.15)}
+#inp::placeholder{color:var(--hint)}
+#inp:disabled{opacity:.5}
+#drop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;max-height:260px;overflow-y:auto;z-index:100;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.di{padding:10px 16px;font-size:13px;cursor:pointer;color:#a0b8d0;border-bottom:1px solid var(--border)}
+.di:last-child{border:none}
+.di:hover,.di.act{background:#1e3050;color:#fff}
+.hint{padding:6px 0 0;font-size:12px;color:var(--hint)}
+#result{padding:28px 32px 60px;max-width:900px;margin:0 auto}
+.empty{text-align:center;padding:80px 0;color:var(--hint);font-size:14px}
+.empty .eg{margin-top:12px;font-size:12px;opacity:.6}
+.villa-id{font-size:30px;font-weight:700;color:#fff;letter-spacing:.5px;margin-bottom:8px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.pill{font-size:11px;font-weight:600;padding:4px 14px;border-radius:20px;letter-spacing:.5px}
+.p22{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd)}
+.p23{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
+.p24{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd)}
+.p25a{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bd)}
+.p25b{background:var(--pink-bg);color:var(--pink);border:1px solid var(--pink-bd)}
+.pno{background:#0d151f;color:var(--hint);border:1px solid var(--border);opacity:.5}
+.sec{border-radius:12px;margin-bottom:14px;overflow:hidden;border:1px solid}
+.s22{border-color:var(--blue-bd);background:#0a1828}
+.s23{border-color:var(--green-bd);background:#071510}
+.s24{border-color:var(--orange-bd);background:#140c04}
+.s25a{border-color:var(--purple-bd);background:#0e0618}
+.s25b{border-color:var(--pink-bd);background:#130610}
+.sec-hd{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;user-select:none;border-bottom:1px solid rgba(255,255,255,.05)}
+.sec-hd:hover{background:rgba(255,255,255,.02)}
+.ytag{font-size:11px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:5px}
+.y22{background:var(--blue-bg);color:var(--blue)}
+.y23{background:var(--green-bg);color:var(--green)}
+.y24{background:var(--orange-bg);color:var(--orange)}
+.y25a{background:var(--purple-bg);color:var(--purple)}
+.y25b{background:var(--pink-bg);color:var(--pink)}
+.slbl{font-size:13px;color:var(--muted);font-weight:500}
+.chev{margin-left:auto;color:var(--hint);transition:transform .2s;font-size:16px}
+.chev.open{transform:rotate(180deg)}
+.sbody table{width:100%;border-collapse:collapse}
+.sbody tr{border-bottom:1px solid rgba(255,255,255,.04)}
+.sbody tr:last-child{border:none}
+.sbody td{padding:10px 20px;font-size:13px;vertical-align:top}
+.sbody td.l{color:var(--muted);width:40%;font-weight:500}
+.sbody td.v{color:var(--text);word-break:break-word}
+.nodata{padding:14px 20px;font-size:13px;color:var(--hint);font-style:italic}
+#loader{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.spin{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-size:13px;color:var(--muted)}
+#loader.hidden{display:none}
+.err{background:#1a0a0a;border:1px solid #4a1010;border-radius:10px;padding:16px 20px;color:#e06060;font-size:13px;margin-bottom:20px}
+</style>
+</head>
+<body>
+<div id="loader">
+  <div class="spin"></div>
+  <p class="load-txt" id="load-msg">Loading property database…</p>
+</div>
+<header>
+  <div class="logo-mark">🏠</div>
+  <div class="logo-text">
+    <div class="t1">Jumeirah Park</div>
+    <div class="t2">Villa Lookup</div>
+  </div>
+  <div class="hdr-right">
+    <div class="stat-n" id="totalCount">—</div>
+    <div class="stat-l">Properties</div>
+  </div>
+</header>
+<div class="search-panel">
+  <div class="search-wrap">
+    <input id="inp" type="text" placeholder="Enter Villa / Property ID  e.g. JPB3VL001  ·  JPMVIL047" autocomplete="off" spellcheck="false" disabled>
+    <div id="drop"></div>
+  </div>
+  <p class="hint">Type at least 2 characters · Arrow keys to navigate · Enter to select</p>
+</div>
+<div id="result">
+  <div class="empty">
+    <div style="font-size:36px;margin-bottom:16px">🏘</div>
+    Enter a Villa Number above to view full property details
+    <div class="eg">JPB3VL001 · JPMVIL047 · JPN3VL027 · JPA3VL001</div>
+  </div>
+</div>
+<script>
+const SECTIONS=[
+  {key:'y22',year:'2022',lbl:'CRM Owner Record',sc:'s22',yc:'y22',pc:'p22',
+   nocomma:['tel','mob','email'],
+   fields:[['owner','Owner Name'],['joint','Joint Owner'],['type','Customer Type'],
+    ['nat','Nationality'],['prop_type','Property Type'],['beds','Bedrooms'],
+    ['bua','BUA (sqft)'],['plot','Plot Area (sqft)'],['plan','Plan Type'],
+    ['theme','Theme'],['tel','Telephone'],['mob','Mobile'],['email','Email'],
+    ['pkg','Package'],['notes','Comments'],['upd','Last Updated']]},
+  {key:'y23',year:'2023',lbl:'Municipality Registry',sc:'s23',yc:'y23',pc:'p23',
+   nocomma:['permit','phone','mob','email','dm_plot'],
+   fields:[['permit','Permit Number'],['owner','Owner Name'],['phone','Phone'],
+    ['mob','Mobile'],['email','Email'],['prop_type','Property Type'],
+    ['usage','Usage'],['rooms','Rooms'],['bua','BUA'],['plot','Plot Area'],
+    ['area_sqm','Actual Area (sqm)'],['dm_plot','DM Plot Number'],
+    ['district','Area / District'],['project','Project'],
+    ['notes','Comments'],['upd','Last Updated']]},
+  {key:'y24',year:'2024',lbl:'Transaction Log',sc:'s24',yc:'y24',pc:'p24',
+   nocomma:['buyer_mob','land_no'],
+   fields:[['buyer','Buyer Name'],['seller','Seller Name'],
+    ['buyer_nat','Buyer Nationality'],['buyer_mob','Buyer Mobile'],
+    ['max_price','Max Price (AED)'],['min_price','Min Price (AED)'],
+    ['txns','No. of Transactions'],['size_sqm','Size (sqm)'],
+    ['prop_type','Property Type'],['land_no','Land Number'],['date','Transaction Date']]},
+  {key:'y25a',year:'2025',lbl:'Registry — Before April',sc:'s25a',yc:'y25a',pc:'p25a',
+   nocomma:['buyer_mob','passport','uae_id'],
+   fields:[['buyer','Buyer Name'],['buyer_nat','Buyer Nationality'],
+    ['buyer_mob','Buyer Mobile'],['passport','Passport Number'],
+    ['uae_id','UAE ID Number'],['dob','Date of Birth'],['procedures','Procedure Types']]},
+  {key:'y25b',year:'2025',lbl:'Transactions — April to December',sc:'s25b',yc:'y25b',pc:'p25b',
+   nocomma:['phone','mob'],
+   fields:[['owner','Owner Name'],['phone','Phone'],['mob','Mobile'],
+    ['txn_amt','Transaction Amount (AED)'],['actual_sqft','Actual Size (sqft)'],
+    ['plot_sqft','Plot Size (sqft)'],['builtup_sqft','Built Up (sqft)'],
+    ['beds','Bedrooms'],['district','District'],['date','Date']]}
+];
+
+let DB=[],ALL_IDS=[],ai=-1,filtered=[];
+
+function fmt(v,nocomma){
+  if(v===null||v===undefined)return null;
+  const s=String(v).trim();
+  if(!s||s==='null'||s==='nan')return null;
+  if(nocomma)return s;
+  const n=parseFloat(s);
+  if(!isNaN(n)&&String(n)===s)return n>=10000?n.toLocaleString():s;
+  return s;
+}
+
+function find(q){
+  const u=q.trim().toUpperCase();
+  return DB.find(r=>r.id.toUpperCase()===u)||null;
+}
+
+function renderVilla(v){
+  const pills=SECTIONS.map(s=>{
+    const has=v[s.key]&&Object.keys(v[s.key]).length>0;
+    return `<span class="pill ${has?s.pc:'pno'}">${s.year}${s.key==='y25a'?' (Before Apr)':s.key==='y25b'?' (Apr–Dec)':''}</span>`;
+  }).join('');
+  const cards=SECTIONS.map(s=>{
+    const d=v[s.key]||{};
+    const nc=s.nocomma||[];
+    const rows=s.fields.map(([k,lbl])=>{
+      const val=fmt(d[k],nc.includes(k));
+      return val?`<tr><td class="l">${lbl}</td><td class="v">${val}</td></tr>`:'';
+    }).join('');
+    const body=rows?`<table>${rows}</table>`:`<p class="nodata">No data available for this period</p>`;
+    return `<div class="sec ${s.sc}"><div class="sec-hd" onclick="tog(this)"><span class="ytag ${s.yc}">${s.year}</span><span class="slbl">${s.lbl}</span><span class="chev open">▾</span></div><div class="sbody">${body}</div></div>`;
+  }).join('');
+  document.getElementById('result').innerHTML=`<div class="villa-id">🏠 ${v.id}</div><div class="pills">${pills}</div>${cards}`;
+}
+
+function tog(hd){
+  const b=hd.nextElementSibling,c=hd.querySelector('.chev');
+  const hide=b.style.display==='none';
+  b.style.display=hide?'':'none';
+  c.classList.toggle('open',hide);
+}
+
+function showNotFound(q){
+  document.getElementById('result').innerHTML=`<div class="err">No villa found for <strong>${q}</strong>. Check the Property ID format.</div>`;
+}
+
+const inp=document.getElementById('inp');
+const drop=document.getElementById('drop');
+
+inp.addEventListener('input',()=>{
+  const q=inp.value.trim().toUpperCase();
+  ai=-1;
+  if(q.length<2){drop.style.display='none';return;}
+  filtered=ALL_IDS.filter(id=>id.toUpperCase().includes(q)).slice(0,14);
+  if(!filtered.length){drop.style.display='none';return;}
+  drop.innerHTML=filtered.map(id=>`<div class="di">${id}</div>`).join('');
+  drop.style.display='block';
+  drop.querySelectorAll('.di').forEach((el,i)=>{el.addEventListener('mousedown',e=>{e.preventDefault();pick(filtered[i]);});});
+});
+
+inp.addEventListener('keydown',e=>{
+  const its=drop.querySelectorAll('.di');
+  if(e.key==='ArrowDown'){ai=Math.min(ai+1,its.length-1);e.preventDefault();}
+  else if(e.key==='ArrowUp'){ai=Math.max(ai-1,-1);e.preventDefault();}
+  else if(e.key==='Enter'){
+    if(ai>=0&&filtered[ai])pick(filtered[ai]);
+    else{const v=find(inp.value);if(v)renderVilla(v);else showNotFound(inp.value);}
+    drop.style.display='none';return;
+  }else if(e.key==='Escape'){drop.style.display='none';return;}
+  its.forEach((el,i)=>el.classList.toggle('act',i===ai));
+  if(ai>=0&&its[ai])its[ai].scrollIntoView({block:'nearest'});
+});
+
+document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))drop.style.display='none';});
+
+function pick(id){
+  inp.value=id;drop.style.display='none';
+  const v=find(id);if(v)renderVilla(v);else showNotFound(id);
+}
+
+async function init(){
+  const msg=document.getElementById('load-msg');
+  try{
+    msg.textContent='Loading part 1 of 3…';
+    const [r1,r2,r3]=await Promise.all([
+      fetch('data1.json').then(r=>r.json()),
+      fetch('data2.json').then(r=>{msg.textContent='Loading part 2 of 3…';return r.json();}),
+      fetch('data3.json').then(r=>{msg.textContent='Loading part 3 of 3…';return r.json();})
+    ]);
+    DB=[...r1,...r2,...r3];
+    ALL_IDS=DB.map(r=>r.id).sort();
+    document.getElementById('totalCount').textContent=DB.length.toLocaleString();
+    inp.disabled=false;
+    inp.focus();
+  }catch(err){
+    document.getElementById('result').innerHTML=`<div class="err"><strong>Could not load database.</strong><br><small>${err}</small></div>`;
+  }finally{
+    document.getElementById('loader').classList.add('hidden');
+  }
+}
+init();
+</script>
+</body>
+</html>
