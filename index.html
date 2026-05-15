@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jumeirah Park · Villa Lookup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fdfaf5;color:#1a0a10;min-height:100vh}
+
+/* ── Header ── */
+header{background:#5c1a2a;height:66px;display:flex;align-items:center;padding:0 36px;position:sticky;top:0;z-index:50}
+.hdr-accent{width:3px;height:30px;background:#e8d5a0;margin-right:14px;flex-shrink:0}
+.hdr-t1{font-size:15px;font-weight:800;color:#fff;letter-spacing:.3px}
+.hdr-t2{font-size:9px;font-weight:600;color:#e8d5a0;letter-spacing:3px;text-transform:uppercase;margin-top:3px}
+.hdr-right{margin-left:auto;text-align:right}
+.hdr-n{font-size:22px;font-weight:800;color:#e8d5a0;line-height:1}
+.hdr-l{font-size:9px;font-weight:600;color:#a06070;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+
+/* ── Search ── */
+.search-wrap{max-width:880px;margin:32px auto 0;padding:0 32px}
+.search-row{display:flex;gap:12px}
+.search-box{flex:1;height:48px;border:2px solid #5c1a2a;border-radius:3px;padding:0 18px;font-size:14px;font-weight:600;color:#1a0a10;background:#fff;outline:none;font-family:'Inter',system-ui,sans-serif;transition:border .15s,box-shadow .15s}
+.search-box:focus{box-shadow:0 0 0 3px rgba(92,26,42,.12)}
+.search-box::placeholder{color:#b09090;font-weight:400}
+.search-box:disabled{opacity:.45;cursor:not-allowed}
+.browse-box{width:230px;height:48px;border:1.5px solid #d8c8c0;border-radius:3px;padding:0 14px;font-size:13px;font-weight:500;color:#5c3040;background:#fff;font-family:'Inter',system-ui,sans-serif;cursor:pointer;outline:none}
+.browse-box:focus{border-color:#5c1a2a}
+.search-hint{margin-top:8px;font-size:11px;color:#b09890;letter-spacing:.3px}
+
+/* ── Autocomplete ── */
+.ac-wrap{position:relative}
+.ac-drop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #5c1a2a;border-radius:3px;max-height:260px;overflow-y:auto;z-index:100;display:none}
+.ac-item{padding:10px 18px;font-size:13px;font-weight:600;color:#3a1020;cursor:pointer;border-bottom:.5px solid #f5eee8}
+.ac-item:last-child{border:none}
+.ac-item:hover,.ac-item.act{background:#fdf5ee;color:#5c1a2a}
+
+/* ── Result ── */
+#result{max-width:880px;margin:28px auto 60px;padding:0 32px}
+.empty-state{text-align:center;padding:80px 0;color:#c0a8a0}
+.empty-icon{font-size:40px;margin-bottom:16px}
+.empty-t{font-size:14px;font-weight:600;color:#8a6060;margin-bottom:8px}
+.empty-eg{font-size:12px;color:#c0a8a0;letter-spacing:.3px}
+
+/* ── Villa header ── */
+.villa-meta{margin-bottom:6px}
+.villa-id{font-size:28px;font-weight:800;color:#3a0f1a;letter-spacing:.3px}
+.villa-sub{font-size:11px;font-weight:600;color:#a07880;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 24px}
+.pill{font-size:10px;font-weight:800;padding:4px 14px;border-radius:2px;letter-spacing:1px;text-transform:uppercase}
+.pill-on{background:#5c1a2a;color:#fff}
+.pill-gold{background:#e8d5a0;color:#5c1a2a}
+.pill-off{background:#f0e8e0;color:#c0a090}
+
+/* ── Section cards ── */
+.sec{background:#fff;border:1px solid #e8ddd4;border-radius:3px;margin-bottom:10px;overflow:hidden}
+.sec-hd{display:flex;align-items:stretch}
+.sec-yr{background:#5c1a2a;color:#fff;font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;padding:13px 16px;display:flex;align-items:center;justify-content:center;min-width:70px}
+.sec-yr-gold{background:#e8d5a0;color:#5c1a2a;font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;padding:13px 16px;display:flex;align-items:center;justify-content:center;min-width:70px}
+.sec-lbl{font-size:11px;font-weight:800;color:#5c1a2a;letter-spacing:1.5px;text-transform:uppercase;padding:13px 20px;display:flex;align-items:center;border-left:1px solid #f0e4dc;background:#fdfaf5}
+.sec-body table{width:100%;border-collapse:collapse}
+.sec-body tr{border-bottom:.5px solid #f5eeea}
+.sec-body tr:last-child{border:none}
+.sec-body td{padding:10px 20px;font-size:13px;vertical-align:top}
+.sec-body td.l{width:38%;font-size:11px;font-weight:700;color:#8a7070;letter-spacing:.5px;text-transform:uppercase;background:#fdfaf5}
+.sec-body td.v{font-weight:700;color:#1a0a10;word-break:break-word}
+.nodata{padding:14px 20px;font-size:12px;color:#c0a8a0;font-style:italic}
+
+/* ── Loader ── */
+#loader{position:fixed;inset:0;background:#fdfaf5;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.spin{width:34px;height:34px;border:3px solid #f0e4dc;border-top-color:#5c1a2a;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-size:12px;font-weight:600;color:#a07878;letter-spacing:1px;text-transform:uppercase}
+#loader.gone{display:none}
+
+/* ── Error ── */
+.err-box{background:#fdf5f5;border:1.5px solid #e8c0c0;border-radius:3px;padding:16px 20px;color:#8a2020;font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="spin"></div>
+  <div class="load-txt" id="load-msg">Loading database</div>
+</div>
+
+<header>
+  <div class="hdr-accent"></div>
+  <div>
+    <div class="hdr-t1">Jumeirah Park</div>
+    <div class="hdr-t2">Villa Property Lookup</div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-n" id="totalCount">—</div>
+    <div class="hdr-l">Properties</div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-row">
+    <div class="ac-wrap" style="flex:1">
+      <input class="search-box" id="inp" type="text" placeholder="Search by Villa / Property ID  e.g.  JPB3VL001  ·  JPMVIL047" autocomplete="off" spellcheck="false" disabled>
+      <div class="ac-drop" id="drop"></div>
+    </div>
+    <select class="browse-box" id="browse"><option value="">— Browse all villas —</option></select>
+  </div>
+  <div class="search-hint">Type 2 or more characters to search · Arrow keys to navigate · Enter to select</div>
+</div>
+
+<div id="result">
+  <div class="empty-state">
+    <div class="empty-icon">🏡</div>
+    <div class="empty-t">Enter a Villa Number or Property ID above</div>
+    <div class="empty-eg">JPB3VL001 &nbsp;·&nbsp; JPMVIL047 &nbsp;·&nbsp; JPN3VL027 &nbsp;·&nbsp; JPA3VL001 &nbsp;·&nbsp; JPT4V043</div>
+  </div>
+</div>
+
+<script>
+const SECTIONS=[
+  {key:'y22',year:'2022',lbl:'CRM Owner Record',gold:false,
+   nc:['tel','mob','email'],
+   fields:[['owner','Owner Name'],['joint','Joint Owner'],['type','Customer Type'],
+    ['nat','Nationality'],['prop_type','Property Type'],['beds','Bedrooms'],
+    ['bua','BUA (sqft)'],['plot','Plot Area (sqft)'],['plan','Plan Type'],
+    ['theme','Theme'],['tel','Telephone'],['mob','Mobile'],['email','Email'],
+    ['pkg','Package'],['notes','Comments'],['upd','Last Updated']]},
+  {key:'y23',year:'2023',lbl:'Municipality Registry',gold:false,
+   nc:['permit','phone','mob','email','dm_plot'],
+   fields:[['permit','Permit Number'],['owner','Owner Name'],['phone','Phone'],
+    ['mob','Mobile'],['email','Email'],['prop_type','Property Type'],
+    ['usage','Usage'],['rooms','Rooms'],['bua','BUA'],['plot','Plot Area'],
+    ['area_sqm','Actual Area (sqm)'],['dm_plot','DM Plot Number'],
+    ['district','Area / District'],['project','Project'],
+    ['notes','Comments'],['upd','Last Updated']]},
+  {key:'y24',year:'2024',lbl:'Transaction Log',gold:true,
+   nc:['buyer_mob','land_no'],
+   fields:[['buyer','Buyer Name'],['seller','Seller Name'],
+    ['buyer_nat','Buyer Nationality'],['buyer_mob','Buyer Mobile'],
+    ['max_price','Max Price (AED)'],['min_price','Min Price (AED)'],
+    ['txns','No. of Transactions'],['size_sqm','Size (sqm)'],
+    ['prop_type','Property Type'],['land_no','Land Number'],['date','Transaction Date']]},
+  {key:'y25a',year:'2025',lbl:'Registry — Before April',gold:true,
+   nc:['buyer_mob','passport','uae_id'],
+   fields:[['buyer','Buyer Name'],['buyer_nat','Buyer Nationality'],
+    ['buyer_mob','Buyer Mobile'],['passport','Passport Number'],
+    ['uae_id','UAE ID Number'],['dob','Date of Birth'],['procedures','Procedure Types']]},
+  {key:'y25b',year:'2025',lbl:'Transactions — April to December',gold:true,
+   nc:['phone','mob'],
+   fields:[['owner','Owner Name'],['phone','Phone'],['mob','Mobile'],
+    ['txn_amt','Transaction Amount (AED)'],['actual_sqft','Actual Size (sqft)'],
+    ['plot_sqft','Plot Size (sqft)'],['builtup_sqft','Built Up (sqft)'],
+    ['beds','Bedrooms'],['district','District'],['date','Date']]}
+];
+
+let DB=[],ALL_IDS=[],ai=-1,filtered=[];
+
+function fmt(v,nocomma){
+  if(v===null||v===undefined)return null;
+  const s=String(v).trim();
+  if(!s||s==='null'||s==='nan'||s==='NaN')return null;
+  if(nocomma)return s;
+  const n=parseFloat(s);
+  if(!isNaN(n)&&String(n)===s)return n>=10000?n.toLocaleString():s;
+  return s;
+}
+
+function find(q){return DB.find(r=>r.id.toUpperCase()===q.trim().toUpperCase())||null}
+
+function renderVilla(v){
+  const pillHTML=SECTIONS.map(s=>{
+    const has=v[s.key]&&Object.keys(v[s.key]).length>0;
+    const cls=has?(s.gold?'pill-gold':'pill-on'):'pill-off';
+    const lbl=s.key==='y25a'?'2025 Before Apr':s.key==='y25b'?'2025 Apr–Dec':s.year;
+    return `<span class="pill ${cls}">${lbl}</span>`;
+  }).join('');
+
+  const cards=SECTIONS.map(s=>{
+    const d=v[s.key]||{};
+    const nc=s.nc||[];
+    const rows=s.fields.map(([k,lbl])=>{
+      const val=fmt(d[k],nc.includes(k));
+      return val?`<tr><td class="l">${lbl}</td><td class="v">${val}</td></tr>`:'';
+    }).join('');
+    const body=rows?`<table>${rows}</table>`:`<div class="nodata">No data available for this period</div>`;
+    const yrCls=s.gold?'sec-yr-gold':'sec-yr';
+    return `<div class="sec"><div class="sec-hd"><div class="${yrCls}">${s.year}</div><div class="sec-lbl">${s.lbl}</div></div><div class="sec-body">${body}</div></div>`;
+  }).join('');
+
+  const sub=v.y23&&v.y23.district?`Jumeirah Park · ${v.y23.district}`:'Jumeirah Park · Dubai';
+  document.getElementById('result').innerHTML=
+    `<div class="villa-meta"><div class="villa-id">🏠 ${v.id}</div><div class="villa-sub">${sub}</div></div>`+
+    `<div class="pills">${pillHTML}</div>${cards}`;
+}
+
+function showErr(msg){
+  document.getElementById('result').innerHTML=`<div class="err-box">${msg}</div>`;
+}
+
+const inp=document.getElementById('inp');
+const drop=document.getElementById('drop');
+const browse=document.getElementById('browse');
+
+inp.addEventListener('input',()=>{
+  const q=inp.value.trim().toUpperCase();
+  ai=-1;
+  if(q.length<2){drop.style.display='none';return;}
+  filtered=ALL_IDS.filter(id=>id.toUpperCase().includes(q)).slice(0,14);
+  if(!filtered.length){drop.style.display='none';return;}
+  drop.innerHTML=filtered.map(id=>`<div class="ac-item">${id}</div>`).join('');
+  drop.style.display='block';
+  drop.querySelectorAll('.ac-item').forEach((el,i)=>{
+    el.addEventListener('mousedown',e=>{e.preventDefault();pick(filtered[i]);});
+  });
+});
+
+inp.addEventListener('keydown',e=>{
+  const its=drop.querySelectorAll('.ac-item');
+  if(e.key==='ArrowDown'){ai=Math.min(ai+1,its.length-1);e.preventDefault();}
+  else if(e.key==='ArrowUp'){ai=Math.max(ai-1,-1);e.preventDefault();}
+  else if(e.key==='Enter'){
+    if(ai>=0&&filtered[ai])pick(filtered[ai]);
+    else{const v=find(inp.value);if(v)renderVilla(v);else showErr(`No property found for <strong>${inp.value}</strong>`);} 
+    drop.style.display='none';return;
+  }else if(e.key==='Escape'){drop.style.display='none';return;}
+  its.forEach((el,i)=>el.classList.toggle('act',i===ai));
+  if(ai>=0&&its[ai])its[ai].scrollIntoView({block:'nearest'});
+});
+
+document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap'))drop.style.display='none';});
+
+browse.addEventListener('change',()=>{
+  if(!browse.value)return;
+  const v=find(browse.value);
+  if(v){inp.value=browse.value;renderVilla(v);}
+});
+
+function pick(id){
+  inp.value=id;drop.style.display='none';browse.value='';
+  const v=find(id);if(v)renderVilla(v);else showErr(`No property found for <strong>${id}</strong>`);
+}
+
+async function init(){
+  const msg=document.getElementById('load-msg');
+  try{
+    msg.textContent='Loading 1 of 3';
+    const [r1,r2,r3]=await Promise.all([
+      fetch('data1.json').then(r=>r.json()),
+      fetch('data2.json').then(r=>r.json()),
+      fetch('data3.json').then(r=>r.json()),
+    ]);
+    DB=[...r1,...r2,...r3];
+    ALL_IDS=DB.map(r=>r.id).sort();
+    document.getElementById('totalCount').textContent=DB.length.toLocaleString();
+    ALL_IDS.forEach(id=>{
+      const o=document.createElement('option');
+      o.value=id;o.textContent=id;
+      browse.appendChild(o);
+    });
+    inp.disabled=false;
+    inp.focus();
+  }catch(err){
+    showErr(`Could not load database. Make sure data1.json, data2.json and data3.json are in the same folder.<br><small style="font-weight:400">${err}</small>`);
+  }finally{
+    document.getElementById('loader').classList.add('gone');
+  }
+}
+init();
+</script>
+</body>
+</html>
